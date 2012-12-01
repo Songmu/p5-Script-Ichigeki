@@ -14,7 +14,11 @@ my $build = Module::Build->new(
     configure_requires => { 'Module::Build' => '0.38' },
     requires           => {
         perl         => '5.008001',
-        # 'parent'     => 0,
+        'Mouse'         => 0,
+        'Time::Piece'   => 0,
+        'Path::Class'   => 0,
+        'File::Tee'             => 0,
+        'IO::Prompt::Simple'    => 0,
     },
 
     no_index    => { 'directory' => [ 'inc' ] },
