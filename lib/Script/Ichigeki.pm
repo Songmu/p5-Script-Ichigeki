@@ -22,6 +22,8 @@ sub import {
 {
     my $_HISSATSU;
     sub ichigeki {
+        die "Already running!\n" if $_HISSATSU;
+
         $_HISSATSU = Script::Ichigeki::Hissatsu->new(@_);
         $_HISSATSU->execute;
     }
