@@ -3,14 +3,36 @@ use 5.008_001;
 use strict;
 use warnings;
 
+use parent qw/Exporter/;
+our @EXPORT = qw/ichigeki/;
+
+sub import {
+    if ($_[1] && $_[1] eq '-ichigeki') {
+        shift; shift;
+        ichigeki(@_);
+    }
+    else {
+        goto &Exporter::import;
+    }
+}
+
+{
+    my $_HISSATSU;
+    sub ichigeki {
+        $_HISSATSU = Script::Ichigeki::Hissatsu->new(@_);
+        $_HISSATSU->execute;
+    }
+}
+
+package Script::Ichigeki::Hissatsu;
+use Mouse;
+use Mouse::Util::TypeConstraints;
+
 use Time::Piece;
 use Path::Class qw/file/;
 use IO::Prompt::Simple qw/prompt/;
 use IO::Handle;
 use File::Tee qw/tee/;
-
-use Mouse;
-use Mouse::Util::TypeConstraints;
 
 subtype 'Time::Piece' => as Object => where { $_->isa('Time::Piece') };
 coerce 'Time::Piece'
@@ -24,6 +46,7 @@ coerce 'Time::Piece'
 has exec_date => (
     is      => 'ro',
     isa     => 'Time::Piece',
+    coerce => 1,
     default => sub {
         localtime(Time::Piece->strptime(localtime->ymd, "%Y-%m-%d"));
     }
@@ -41,7 +64,7 @@ has log_file_postfix => (
 
 has script => (
     is       => 'ro',
-    required => 1,
+    default  => sub { file($0) },
 );
 
 has is_running => (
@@ -51,21 +74,7 @@ has is_running => (
 no Mouse;
 
 sub exiting {
-    warn shift;
-    exit(1);
-}
-
-our $SELF;
-sub import {
-    my $pkg = shift;
-    my %args = @_;
-
-    exiting 'Already running!' if $SELF;
-
-    $args{script} = file($0);
-    $SELF = $pkg->new(%args);
-
-    $SELF->execute;
+    die shift;
 }
 
 sub execute {
@@ -88,7 +97,7 @@ sub execute {
     my $fh = $self->log_file->open('>>');
     $fh->print(join "\n",
         '# This file is generated dy Script::Icigeki.',
-        "start: @{[$now->datetime]}",
+        "start: @{[localtime->datetime]}",
         '---', ''
     );
 
@@ -108,15 +117,20 @@ sub execute {
     }
 }
 
-END {
-    if ($SELF->is_running) {
+sub end {
+    my $self = shift;
+    if ($self->is_running) {
         my $now = localtime->datetime;
-        my $fh = $SELF->log_file->open('>>');
+        my $fh = $self->log_file->open('>>');
         $fh->print(join "\n",
             '---',
             "end: $now",'',
         );
     }
+}
+
+sub DEMOLISH {
+    shift->end;
 }
 
 __PACKAGE__->meta->make_immutable;
