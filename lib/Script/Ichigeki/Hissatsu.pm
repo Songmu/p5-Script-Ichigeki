@@ -45,28 +45,24 @@ has is_running => (
     is       => 'rw',
 );
 
-has in_use => (
+has in_compilation => (
     is => 'ro'
 );
 
 no Mouse;
-
-sub exiting {
-    die shift ."\n";
-}
 
 sub execute {
     my $self = shift;
 
     my $now   = localtime;
     my $today = localtime(Time::Piece->strptime($now->ymd, "%Y-%m-%d"));
-    exiting $self->exec_date .' is not today!' unless $self->exec_date == $today;
+    $self->exiting($self->exec_date .' is not today!') unless $self->exec_date == $today;
 
-    exiting sprintf('execute log file [%s] is alredy exists!', $self->log_file) if -f $self->log_file;
+    $self->exiting(sprintf('execute log file [%s] is alredy exists!', $self->log_file)) if -f $self->log_file;
 
     if ($self->confirm_dialog) {
         my $answer = prompt('Do you really execute `' . $self->script->basename . '` ? (y/n)');
-        exiting 'canceled.' unless $answer =~ /^y(?:es)?$/i;
+        $self->exiting('canceled.') unless $answer =~ /^y(?:es)?$/i;
     }
 
     STDOUT->autoflush;
@@ -95,7 +91,20 @@ sub execute {
     }
 }
 
-sub end {
+sub exiting {
+    my ($self, $msg) = @_;
+
+    $msg .= "\n";
+    if ($self->in_compilation) {
+        warn $msg;
+        exit 1;
+    }
+    else {
+        die $msg;
+    }
+}
+
+sub DEMOLISH {
     my $self = shift;
     if ($self->is_running) {
         my $now = localtime->datetime;
@@ -105,10 +114,6 @@ sub end {
             "end: $now",'',
         );
     }
-}
-
-sub DEMOLISH {
-    shift->end;
 }
 
 __PACKAGE__->meta->make_immutable;

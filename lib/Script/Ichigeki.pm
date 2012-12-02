@@ -12,7 +12,7 @@ our @EXPORT = qw/ichigeki/;
 sub import {
     if ($_[1] && $_[1] eq '-ichigeki') {
         shift; shift;
-        ichigeki(@_, in_use => 1);
+        ichigeki(@_, in_compilation => 1);
     }
     else {
         goto &Exporter::import;
