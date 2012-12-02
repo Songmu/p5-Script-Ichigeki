@@ -149,9 +149,7 @@ This document describes Script::Ichigeki::Hissatsu version 0.01.
 
 =head2 Functions
 
-=head3 C<< hello() >>
-
-# TODO
+=head3 C<< execute(%options) >>
 
 =head1 DEPENDENCIES
 

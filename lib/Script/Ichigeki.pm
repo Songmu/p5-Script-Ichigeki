@@ -39,16 +39,20 @@ This document describes Script::Ichigeki version 0.01.
 
 =head1 SYNOPSIS
 
+    use Script::Ichigeki;
+
+It is same as
+
     use Script::Ichigeki (
-        exec_date       => '2012-12-04',
+        exec_date       => 'XXXX-XX-XX', # today
         confirm_dialog  => 1,
     );
 
-    or
+or
 
     use Script::Ichigeki ();
     Script::Ichigeki->hissatsu(
-        exec_date       => '2012-12-04',
+        exec_date       => 'XXXX-XX-XX', # today
         confirm_dialog  => 1,
     );
 
@@ -65,7 +69,7 @@ and preventing rerunning.
 
 =head2 Functions
 
-=head3 C<< ichigeki(%options) >>
+=head3 C<< hissatsu(%options) >>
 
 Automatically called in use phase.
 
