@@ -2,7 +2,7 @@
 use strict;
 use Test::More;
 
-use Script::Ichigeki;
+use Script::Ichigeki ();
 
 # test Script::Ichigeki here
 pass;

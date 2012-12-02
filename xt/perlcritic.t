@@ -1,6 +1,7 @@
 use strict;
 use Test::More;
 eval q{
+    use Script::Ichigeki ();
     use Perl::Critic 1.105;
     use Test::Perl::Critic -profile => \do { local $/; <DATA> };
 };
