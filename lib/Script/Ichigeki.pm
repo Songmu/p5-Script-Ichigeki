@@ -2,6 +2,9 @@ package Script::Ichigeki;
 use 5.008_001;
 use strict;
 use warnings;
+our $VERSION = '0.01';
+
+use Script::Ichigeki::Hissatsu;
 
 use parent qw/Exporter/;
 our @EXPORT = qw/ichigeki/;
@@ -9,7 +12,7 @@ our @EXPORT = qw/ichigeki/;
 sub import {
     if ($_[1] && $_[1] eq '-ichigeki') {
         shift; shift;
-        ichigeki(@_);
+        ichigeki(@_, in_use => 1);
     }
     else {
         goto &Exporter::import;
@@ -24,116 +27,7 @@ sub import {
     }
 }
 
-package Script::Ichigeki::Hissatsu;
-use Mouse;
-use Mouse::Util::TypeConstraints;
-
-use Time::Piece;
-use Path::Class qw/file/;
-use IO::Prompt::Simple qw/prompt/;
-use IO::Handle;
-use File::Tee qw/tee/;
-
-subtype 'Time::Piece' => as Object => where { $_->isa('Time::Piece') };
-coerce 'Time::Piece'
-    => from 'Str',
-    => via {
-        my $t = Time::Piece->strptime($_, '%Y-%m-%d');
-        die "Invalie time format: [$_] .(format should be '%Y-%m-%d'.)" unless $t;
-        localtime($t);
-    };
-
-has exec_date => (
-    is      => 'ro',
-    isa     => 'Time::Piece',
-    coerce => 1,
-    default => sub {
-        localtime(Time::Piece->strptime(localtime->ymd, "%Y-%m-%d"));
-    }
-);
-
-has confirm_dialog => (
-    is      => 'ro',
-    default => 1,
-);
-
-has log_file_postfix => (
-    is      => 'ro',
-    default => '.log',
-);
-
-has script => (
-    is       => 'ro',
-    default  => sub { file($0) },
-);
-
-has is_running => (
-    is       => 'rw',
-);
-
-no Mouse;
-
-sub exiting {
-    die shift;
-}
-
-sub execute {
-    my $self = shift;
-
-    my $now   = localtime;
-    my $today = localtime(Time::Piece->strptime($now->ymd, "%Y-%m-%d"));
-    exiting $self->exec_date .' is not today!' unless $self->exec_date == $today;
-
-    exiting sprintf('execute log file [%s] is alredy exists!', $self->log_file) if -f $self->log_file;
-
-    if ($self->confirm_dialog) {
-        my $answer = prompt('Do you really execute `' . $self->script->basename . '` ? (y/n)');
-        exiting 'canceled.' unless $answer =~ /^y(?:es)?$/i;
-    }
-
-    STDOUT->autoflush;
-    STDERR->autoflush;
-
-    my $fh = $self->log_file->open('>>');
-    $fh->print(join "\n",
-        '# This file is generated dy Script::Icigeki.',
-        "start: @{[localtime->datetime]}",
-        '---', ''
-    );
-
-    $self->is_running(1);
-    tee STDOUT, $fh;
-    tee STDERR, $fh;
-}
-
-{
-    my  $_log_file;
-    sub log_file {
-        my $self = shift;
-        $_log_file ||= do {
-            my $script = $self->script;
-            $script->dir->file('.' . $script->basename . $self->log_file_postfix);
-        };
-    }
-}
-
-sub end {
-    my $self = shift;
-    if ($self->is_running) {
-        my $now = localtime->datetime;
-        my $fh = $self->log_file->open('>>');
-        $fh->print(join "\n",
-            '---',
-            "end: $now",'',
-        );
-    }
-}
-
-sub DEMOLISH {
-    shift->end;
-}
-
-__PACKAGE__->meta->make_immutable;
+1;
 __END__
 
 =head1 NAME
