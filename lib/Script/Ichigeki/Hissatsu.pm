@@ -56,19 +56,19 @@ sub execute {
 
     my $now   = localtime;
     my $today = localtime(Time::Piece->strptime($now->ymd, "%Y-%m-%d"));
-    $self->exiting('exec_date: '. $self->exec_date->strftime('%Y-%m-%d') .' is not today!') unless $self->exec_date == $today;
+    $self->_exiting('exec_date: '. $self->exec_date->strftime('%Y-%m-%d') .' is not today!') unless $self->exec_date == $today;
 
-    $self->exiting(sprintf('execute log file [%s] is alredy exists!', $self->log_file)) if -f $self->log_file;
+    $self->_exiting(sprintf('execute log file [%s] is alredy exists!', $self->_log_file)) if -f $self->_log_file;
 
     if ($self->confirm_dialog) {
         my $answer = prompt('Do you really execute `' . $self->script->basename . '` ? (y/n)');
-        $self->exiting('canceled.') unless $answer =~ /^y(?:es)?$/i;
+        $self->_exiting('canceled.') unless $answer =~ /^y(?:es)?$/i;
     }
 
     STDOUT->autoflush;
     STDERR->autoflush;
 
-    $self->log(join "\n",
+    $self->_log(join "\n",
         '# This file is generated dy Script::Icigeki.',
         "start: @{[localtime->datetime]}",
         '---', ''
@@ -81,7 +81,7 @@ sub execute {
 
 {
     my  $_log_file;
-    sub log_file {
+    sub _log_file {
         my $self = shift;
         $_log_file ||= do {
             my $script = $self->script;
@@ -91,16 +91,16 @@ sub execute {
 
     my $_log_fh;
     sub _log_fh {
-        $_log_fh ||= shift->log_file->open('>>');
+        $_log_fh ||= shift->_log_file->open('>>');
     }
 }
 
-sub log {
+sub _log {
     shift->_log_fh->print(@_);
 }
 
 
-sub exiting {
+sub _exiting {
     my ($self, $msg) = @_;
 
     $msg .= "\n";
@@ -117,7 +117,7 @@ sub DEMOLISH {
     my $self = shift;
     if ($self->is_running) {
         my $now = localtime->datetime;
-        $self->log(join "\n",
+        $self->_log(join "\n",
             '','---',
             "end: $now",'',
         );
