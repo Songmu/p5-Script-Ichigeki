@@ -68,16 +68,15 @@ sub execute {
     STDOUT->autoflush;
     STDERR->autoflush;
 
-    my $fh = $self->log_file->open('>>');
-    $fh->print(join "\n",
+    $self->log(join "\n",
         '# This file is generated dy Script::Icigeki.',
         "start: @{[localtime->datetime]}",
         '---', ''
     );
 
     $self->is_running(1);
-    tee STDOUT, $fh;
-    tee STDERR, $fh;
+    tee STDOUT, $self->_log_fh;
+    tee STDERR, $self->_log_fh;
 }
 
 {
@@ -89,7 +88,17 @@ sub execute {
             $script->dir->file('.' . $script->basename . $self->log_file_postfix);
         };
     }
+
+    my $_log_fh;
+    sub _log_fh {
+        $_log_fh ||= shift->log_file->open('>>');
+    }
 }
+
+sub log {
+    shift->_log_fh->print(@_);
+}
+
 
 sub exiting {
     my ($self, $msg) = @_;
@@ -108,8 +117,7 @@ sub DEMOLISH {
     my $self = shift;
     if ($self->is_running) {
         my $now = localtime->datetime;
-        my $fh = $self->log_file->open('>>');
-        $fh->print(join "\n",
+        $self->log(join "\n",
             '','---',
             "end: $now",'',
         );

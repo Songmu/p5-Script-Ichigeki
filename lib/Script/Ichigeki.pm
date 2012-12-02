@@ -20,6 +20,10 @@ sub import {
         $_HISSATSU = Script::Ichigeki::Hissatsu->new(@_);
         $_HISSATSU->execute;
     }
+
+    END {
+        undef $_HISSATSU;
+    }
 }
 
 1;
