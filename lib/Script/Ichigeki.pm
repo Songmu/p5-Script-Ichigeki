@@ -6,23 +6,16 @@ our $VERSION = '0.01';
 
 use Script::Ichigeki::Hissatsu;
 
-use parent qw/Exporter/;
-our @EXPORT = qw/ichigeki/;
-
 sub import {
-    if ($_[1] && $_[1] eq '-ichigeki') {
-        shift; shift;
-        ichigeki(@_, in_compilation => 1);
-    }
-    else {
-        goto &Exporter::import;
-    }
+    my $pkg = shift;
+    $pkg->hissatsu(@_, in_compilation => 1);
 }
 
 {
     my $_HISSATSU;
-    sub ichigeki {
+    sub hissatsu {
         die "Already running!\n" if $_HISSATSU;
+        my $pkg = shift;
 
         $_HISSATSU = Script::Ichigeki::Hissatsu->new(@_);
         $_HISSATSU->execute;

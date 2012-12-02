@@ -56,7 +56,7 @@ sub execute {
 
     my $now   = localtime;
     my $today = localtime(Time::Piece->strptime($now->ymd, "%Y-%m-%d"));
-    $self->exiting($self->exec_date .' is not today!') unless $self->exec_date == $today;
+    $self->exiting('exec_date: '. $self->exec_date->strftime('%Y-%m-%d') .' is not today!') unless $self->exec_date == $today;
 
     $self->exiting(sprintf('execute log file [%s] is alredy exists!', $self->log_file)) if -f $self->log_file;
 
@@ -110,7 +110,7 @@ sub DEMOLISH {
         my $now = localtime->datetime;
         my $fh = $self->log_file->open('>>');
         $fh->print(join "\n",
-            '---',
+            '','---',
             "end: $now",'',
         );
     }
