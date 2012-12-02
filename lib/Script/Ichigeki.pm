@@ -31,7 +31,7 @@ __END__
 
 =head1 NAME
 
-Script::Ichigeki - Perl extention to do something
+Script::Ichigeki - Perl extention for one time script.
 
 =head1 VERSION
 
@@ -39,19 +39,46 @@ This document describes Script::Ichigeki version 0.01.
 
 =head1 SYNOPSIS
 
-    use Script::Ichigeki;
+    use Script::Ichigeki (
+        exec_date       => '2012-12-04',
+        confirm_dialog  => 1,
+    );
+
+    or
+
+    use Script::Ichigeki ();
+    Script::Ichigeki->hissatsu(
+        exec_date       => '2012-12-04',
+        confirm_dialog  => 1,
+    );
 
 =head1 DESCRIPTION
 
-# TODO
+Script::Ichigeki is the module for one time script for mission critical
+(especially for preventing rerunning it).
+
+Only describing `use Script::Ichigeki`, confirm dialog is displayed and execution result
+is saved in log file automatically. This log file double with lock file for mutual exclusion
+and preventing rerunning.
 
 =head1 INTERFACE
 
 =head2 Functions
 
-=head3 C<< hello() >>
+=head3 C<< ichigeki(%options) >>
 
-# TODO
+Automatically called in use phase.
+
+Available options are:
+
+=head4 C<< exec_date => 'Str|Time::Piece' >>
+
+Date for execution date. Format is '%Y-%m-%d'.
+
+=head4 C<< confirm_dialog => 'Bool' >>
+
+Confirm dialog is to be displayed or not.
+default: 1
 
 =head1 DEPENDENCIES
 
