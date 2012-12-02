@@ -65,30 +65,36 @@ sub import {
     $args{script} = file($0);
     $SELF = $pkg->new(%args);
 
+    $SELF->execute;
+}
+
+sub execute {
+    my $self = shift;
+
     my $now   = localtime;
     my $today = localtime(Time::Piece->strptime($now->ymd, "%Y-%m-%d"));
-    exiting $SELF->exec_date .' is not today!' unless $SELF->exec_date == $today;
+    exiting $self->exec_date .' is not today!' unless $self->exec_date == $today;
 
-    exiting sprintf('execute log file [%s] is exists!', $SELF->log_file) if -f $SELF->log_file;
+    exiting sprintf('execute log file [%s] is alredy exists!', $self->log_file) if -f $self->log_file;
 
-    if ($SELF->confirm_dialog) {
-        my $answer = prompt('Do you really execute `' . $SELF->script->basename . '` ? (y/n)');
+    if ($self->confirm_dialog) {
+        my $answer = prompt('Do you really execute `' . $self->script->basename . '` ? (y/n)');
         exiting 'canceled.' unless $answer =~ /^y(?:es)?$/i;
     }
 
     STDOUT->autoflush;
     STDERR->autoflush;
 
-    open STDERR, ">&", *STDOUT;
-    my $fh = $SELF->log_file->openw;
+    my $fh = $self->log_file->open('>>');
     $fh->print(join "\n",
-        '# This file is generate dy Script::Icigeki',
-        "start: $now",
+        '# This file is generated dy Script::Icigeki.',
+        "start: @{[$now->datetime]}",
         '---', ''
     );
 
-    $SELF->is_running(1);
+    $self->is_running(1);
     tee STDOUT, $fh;
+    tee STDERR, $fh;
 }
 
 {
@@ -97,18 +103,18 @@ sub import {
         my $self = shift;
         $_log_file ||= do {
             my $script = $self->script;
-            file($script->dir . '/.' . $script->basename . $self->log_file_postfix);
+            $script->dir->file('.' . $script->basename . $self->log_file_postfix);
         };
     }
 }
 
 END {
     if ($SELF->is_running) {
-        my $now = localtime;
-        my $fh = $SELF->log_file->openw;
+        my $now = localtime->datetime;
+        my $fh = $SELF->log_file->open('>>');
         $fh->print(join "\n",
             '---',
-            "start: $now",'',
+            "end: $now",'',
         );
     }
 }
