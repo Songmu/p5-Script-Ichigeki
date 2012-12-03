@@ -42,6 +42,7 @@
 \.tmp$
 \.#
 \.rej$
+tmp/
 
 # Avoid OS-specific files/dirs
 # Mac OSX metadata
@@ -65,3 +66,8 @@
 \.o(?:|bj|ld|ut)$
 nytprof
 MYMETA\.yml$
+
+\.local\.perl\.vimrc
+\.dimconfig
+\.shipit
+^MANIFEST\.

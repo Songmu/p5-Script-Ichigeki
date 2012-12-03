@@ -6,8 +6,13 @@ WriteMakefile
   'NAME' => 'Script::Ichigeki',
   'VERSION_FROM' => 'lib/Script/Ichigeki.pm',
   'PREREQ_PM' => {
+                   'File::Tee' => 0,
+                   'IO::Prompt::Simple' => 0,
+                   'Mouse' => 0,
+                   'Path::Class' => 0,
                    'Test::More' => '0.98',
-                   'Test::Requires' => '0.06'
+                   'Test::Requires' => '0.06',
+                   'Time::Piece' => 0
                  },
   'INSTALLDIRS' => 'site',
   'EXE_FILES' => [],
