@@ -65,6 +65,12 @@ Only describing `use Script::Ichigeki`, confirm dialog is displayed and executio
 is saved in log file automatically. This log file double with lock file for mutual exclusion
 and preventing rerunning.
 
+=head1 CAUTION
+
+THE SOFTWARE IS IT'S IN ALPHA QUALITY. IT MAY CHANGE THE API WITHOUT NOTICE.
+
+If forking in your script, the software may not be properly handling it.
+
 =head1 INTERFACE
 
 =head2 Functions
