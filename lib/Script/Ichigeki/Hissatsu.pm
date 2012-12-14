@@ -2,11 +2,13 @@ package Script::Ichigeki::Hissatsu;
 use Mouse;
 use Mouse::Util::TypeConstraints;
 
+use Encode;
 use Time::Piece;
 use Path::Class qw/file/;
 use IO::Prompt::Simple qw/prompt/;
 use IO::Handle;
 use File::Tee qw/tee/;
+use Term::Encoding qw(term_encoding);
 
 subtype 'Time::Piece' => as Object => where { $_->isa('Time::Piece') };
 coerce 'Time::Piece'
@@ -49,6 +51,13 @@ has in_compilation => (
     is => 'ro'
 );
 
+has dialog_message => (
+    is   => 'ro',
+    default => sub {
+        'Do you really execute `%s` ?';
+    }
+);
+
 no Mouse;
 
 sub execute {
@@ -58,10 +67,11 @@ sub execute {
     my $today = localtime(Time::Piece->strptime($now->ymd, "%Y-%m-%d"));
     $self->_exiting('exec_date: '. $self->exec_date->strftime('%Y-%m-%d') .' is not today!') unless $self->exec_date == $today;
 
-    $self->_exiting(sprintf('execute log file [%s] alredy exists!', $self->_log_file)) if -f $self->_log_file;
+    $self->_exiting(sprintf('Can\'t execute! Execution log file [%s] already exists!', $self->_log_file)) if -f $self->_log_file;
 
     if ($self->confirm_dialog) {
-        my $answer = prompt('Do you really execute `' . $self->script->basename . '` ? (y/n)');
+        my $enc = term_encoding || 'utf-8';
+        my $answer = prompt(encode($enc, sprintf($self->dialog_message, $self->script->basename) . ' [y/n] [n]'));
         $self->_exiting('canceled.') unless $answer =~ /^y(?:es)?$/i;
     }
 
@@ -69,7 +79,7 @@ sub execute {
     STDERR->autoflush;
 
     $self->_log(join "\n",
-        '# This file is generated dy Script::Icigeki.',
+        '# This log file is generated dy Script::Icigeki.',
         "start: @{[localtime->datetime]}",
         '---', ''
     );
