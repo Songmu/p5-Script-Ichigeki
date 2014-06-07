@@ -1,5 +1,7 @@
 Revision history for Perl extension Script::Ichigeki
 
+{{$NEXT}}
+
 0.03    Fri Dec 14 02:18:00 2012
         - add dialog_message feature
         - fix some broken English
