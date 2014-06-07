@@ -2,7 +2,7 @@ package Script::Ichigeki;
 use 5.008_001;
 use strict;
 use warnings;
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 use Script::Ichigeki::Hissatsu;
 
@@ -31,11 +31,11 @@ __END__
 
 =head1 NAME
 
-Script::Ichigeki - Perl extention for one time script.
+Script::Ichigeki - Perl extension for one time script.
 
 =head1 VERSION
 
-This document describes Script::Ichigeki version 0.01.
+This document describes Script::Ichigeki version 0.04.
 
 =head1 SYNOPSIS
 

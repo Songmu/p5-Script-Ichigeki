@@ -1,10 +1,10 @@
 # NAME
 
-Script::Ichigeki - Perl extention for one time script.
+Script::Ichigeki - Perl extension for one time script.
 
 # VERSION
 
-This document describes Script::Ichigeki version 0.01.
+This document describes Script::Ichigeki version 0.04.
 
 # SYNOPSIS
 
